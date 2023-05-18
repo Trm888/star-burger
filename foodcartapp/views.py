@@ -1,8 +1,12 @@
+import json
+from pprint import pprint
+
 from django.http import JsonResponse
+from django.shortcuts import get_object_or_404
 from django.templatetags.static import static
 
 
-from .models import Product
+from .models import Product, Order, OrderItem
 
 
 def banners_list_api(request):
@@ -58,5 +62,24 @@ def product_list_api(request):
 
 
 def register_order(request):
-    # TODO это лишь заглушка
-    return JsonResponse({})
+    try:
+        order_info = json.loads(request.body)
+        order = Order.objects.create(
+            name=order_info['firstname'],
+            given_name=order_info['lastname'],
+            phone=order_info['phonenumber'],
+            address=order_info['address'],
+        )
+
+        for products in order_info['products']:
+            order_item = OrderItem.objects.create(
+                product_id=products['product'],
+                quantity=products['quantity'],
+                order=order,
+            )
+        return JsonResponse({'order_id': order.id}, status=201)
+
+
+    except ValueError:
+        return JsonResponse({'error': 'Invalid JSON'}, status=400)
+
