@@ -1,12 +1,9 @@
-import json
-from pprint import pprint
-
 from django.http import JsonResponse
 from django.templatetags.static import static
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
-from .models import Product, Order, OrderItem
 
+from .models import Product, Order, OrderItem
 
 
 def banners_list_api(request):
@@ -31,7 +28,6 @@ def banners_list_api(request):
         'ensure_ascii': False,
         'indent': 4,
     })
-
 
 
 def product_list_api(request):
@@ -66,6 +62,8 @@ def product_list_api(request):
 def register_order(request):
     try:
         order_info = request.data
+        if not order_info['products']:
+            raise ValueError
         print(order_info)
         order = Order.objects.create(
             name=order_info['firstname'],
@@ -75,12 +73,18 @@ def register_order(request):
         )
 
         for products in order_info['products']:
-            order_item = OrderItem.objects.create(
+            order_items = OrderItem.objects.create(
                 product_id=products['product'],
                 quantity=products['quantity'],
                 order=order,
             )
         return Response({'order_id': order.id}, status=201)
 
+    except TypeError:
+        return Response({'error': 'product key null or not a list'}, status=400)
+
     except ValueError:
-        return Response({'error': 'Invalid JSON'}, status=400)
+        return Response({'error': 'list is empty'}, status=400)
+
+    except KeyError:
+        return Response({'error': 'key not found'}, status=400)
