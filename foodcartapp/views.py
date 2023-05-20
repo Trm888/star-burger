@@ -1,3 +1,4 @@
+import phonenumbers
 from django.http import JsonResponse
 from django.templatetags.static import static
 from rest_framework.decorators import api_view
@@ -60,31 +61,47 @@ def product_list_api(request):
 
 @api_view(['POST'])
 def register_order(request):
-    try:
-        order_info = request.data
-        if not order_info['products']:
-            raise ValueError
-        print(order_info)
-        order = Order.objects.create(
-            name=order_info['firstname'],
-            given_name=order_info['lastname'],
-            phone=order_info['phonenumber'],
-            address=order_info['address'],
+    order_info = request.data
+    product_ids = Product.objects.values_list('id', flat=True)
+    keys_to_check = ['products', 'firstname', 'lastname', 'phonenumber', 'address']
+    print(order_info)
+    print(product_ids)
+
+    missing_keys = [key for key in keys_to_check if key not in order_info]
+    print(missing_keys)
+    if missing_keys:
+        return Response({'error': f'Отсутствуют обязательные ключи: {", ".join(missing_keys)}'}, status=400)
+
+    if not isinstance(order_info['products'], list) or not order_info['products']:
+        return Response({'error': 'Список продуктов пуст'}, status=400)
+
+    for product in order_info['products']:
+        if product["product"] not in product_ids:
+            return Response({'error': f'Продукт с id {product["product"]} не найден'}, status=400)
+
+    not_str_fields = [key for key, value in order_info.items() if key != 'products' and not isinstance(value, str)]
+    if not_str_fields:
+        return Response({'error': f'fields {", ".join(not_str_fields)} is not a string'}, status=400)
+
+    empty_fields = [key for key, value in order_info.items() if not value]
+    if empty_fields:
+        return Response({'error': f'fields {", ".join(empty_fields)} is empty'}, status=400)
+
+    parse_number = phonenumbers.parse(order_info['phonenumber'], "RU")
+    if not phonenumbers.is_valid_number(parse_number):
+        return Response({'error': f'Невалидный номер телефона'}, status=400)
+
+    order = Order.objects.create(
+        name=order_info['firstname'],
+        given_name=order_info['lastname'],
+        phone=order_info['phonenumber'],
+        address=order_info['address'],
+    )
+
+    for products in order_info['products']:
+        order_items = OrderItem.objects.create(
+            product_id=products['product'],
+            quantity=products['quantity'],
+            order=order,
         )
-
-        for products in order_info['products']:
-            order_items = OrderItem.objects.create(
-                product_id=products['product'],
-                quantity=products['quantity'],
-                order=order,
-            )
-        return Response({'order_id': order.id}, status=201)
-
-    except TypeError:
-        return Response({'error': 'product key null or not a list'}, status=400)
-
-    except ValueError:
-        return Response({'error': 'list is empty'}, status=400)
-
-    except KeyError:
-        return Response({'error': 'key not found'}, status=400)
+    return Response({'order_id': order.id}, status=201)

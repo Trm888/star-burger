@@ -125,16 +125,17 @@ class RestaurantMenuItem(models.Model):
 
 
 class OrderItem(models.Model):
-    product = models.ForeignKey('Product', on_delete=models.CASCADE)
-    quantity = models.PositiveIntegerField('Количество', validators=[MinValueValidator(1)], default=1)
-    order = models.ForeignKey('Order', on_delete=models.CASCADE, related_name='items')
+    product = models.ForeignKey('Product', on_delete=models.CASCADE, blank=False, null=False)
+    quantity = models.PositiveIntegerField('Количество', validators=[MinValueValidator(1)], default=1, blank=False,
+                                           null=False)
+    order = models.ForeignKey('Order', on_delete=models.CASCADE, related_name='items', blank=False, null=False)
+
 
 class Order(models.Model):
-    name = models.CharField('Имя', max_length=50)
-    given_name = models.CharField('Фамилия', max_length=50)
-    phone = PhoneNumberField('Телефон')
-    address = models.CharField('Адрес', max_length=300)
-
+    name = models.CharField('Имя', max_length=50, blank=False, null=False)
+    given_name = models.CharField('Фамилия', max_length=50, blank=False, null=False)
+    phone = PhoneNumberField('Телефон', blank=False, null=False)
+    address = models.CharField('Адрес', max_length=300, blank=False, null=False)
 
     class Meta:
         verbose_name = 'Заказ'
