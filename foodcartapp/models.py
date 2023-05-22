@@ -143,4 +143,4 @@ class Order(models.Model):
         ordering = ['firstname', 'lastname', 'phonenumber', 'address']
 
     def __str__(self):
-        return f'{self.name} {self.given_name} {self.address}'
+        return f'{self.firstname} {self.lastname} {self.address}'
