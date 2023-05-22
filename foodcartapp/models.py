@@ -1,5 +1,6 @@
 from django.core.validators import MinValueValidator
 from django.db import models
+from django.db.models import F, Sum
 from phonenumber_field.modelfields import PhoneNumberField
 
 
@@ -36,6 +37,12 @@ class ProductQuerySet(models.QuerySet):
         )
         return self.filter(pk__in=products)
 
+
+class OrderQuerySet(models.QuerySet):
+    def get_total_price(self):
+        return self.annotate(
+            total_price=models.Sum(models.F('products__quantity') * models.F('products__product__price'))
+        )
 
 class ProductCategory(models.Model):
     name = models.CharField(
@@ -136,6 +143,8 @@ class Order(models.Model):
     lastname = models.CharField('Фамилия', max_length=50, blank=False, null=False)
     phonenumber = PhoneNumberField('Телефон', blank=False, null=False)
     address = models.CharField('Адрес', max_length=300, blank=False, null=False)
+
+    objects = OrderQuerySet.as_manager()
 
     class Meta:
         verbose_name = 'Заказ'
