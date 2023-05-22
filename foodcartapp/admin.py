@@ -24,9 +24,9 @@ class RestaurantMenuItemInline(admin.TabularInline):
 @admin.register(Order)
 class OrderAdmin(admin.ModelAdmin):
     list_display = [
-        'name',
-        'given_name',
-        'phone',
+        'firstname',
+        'lastname',
+        'phonenumber',
         'address',
     ]
     inlines = [

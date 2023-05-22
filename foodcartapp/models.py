@@ -125,22 +125,22 @@ class RestaurantMenuItem(models.Model):
 
 
 class OrderItem(models.Model):
+    order = models.ForeignKey('Order', on_delete=models.CASCADE, related_name='products', blank=False, null=False)
     product = models.ForeignKey('Product', on_delete=models.CASCADE, blank=False, null=False)
     quantity = models.PositiveIntegerField('Количество', validators=[MinValueValidator(1)], default=1, blank=False,
                                            null=False)
-    order = models.ForeignKey('Order', on_delete=models.CASCADE, related_name='items', blank=False, null=False)
 
 
 class Order(models.Model):
-    name = models.CharField('Имя', max_length=50, blank=False, null=False)
-    given_name = models.CharField('Фамилия', max_length=50, blank=False, null=False)
-    phone = PhoneNumberField('Телефон', blank=False, null=False)
+    firstname = models.CharField('Имя', max_length=50, blank=False, null=False)
+    lastname = models.CharField('Фамилия', max_length=50, blank=False, null=False)
+    phonenumber = PhoneNumberField('Телефон', blank=False, null=False)
     address = models.CharField('Адрес', max_length=300, blank=False, null=False)
 
     class Meta:
         verbose_name = 'Заказ'
         verbose_name_plural = 'Заказы'
-        ordering = ['name', 'given_name', 'phone', 'address']
+        ordering = ['firstname', 'lastname', 'phonenumber', 'address']
 
     def __str__(self):
         return f'{self.name} {self.given_name} {self.address}'
