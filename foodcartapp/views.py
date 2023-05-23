@@ -5,7 +5,7 @@ from rest_framework.decorators import api_view
 from rest_framework.response import Response
 from rest_framework.serializers import ModelSerializer
 
-from django.db import models
+from django.db import models, transaction
 from .models import Product, Order, OrderItem
 
 
@@ -76,6 +76,7 @@ class OrderSerializer(ModelSerializer):
 
 
 @api_view(['POST'])
+@transaction.atomic
 def register_order(request):
     client_order = request.data
 
@@ -96,6 +97,7 @@ def register_order(request):
             price=products['product'].price * products['quantity'],
             order=order,
         )
+
     return Response({'id': order.id,
                      'firstname': serializer_order.validated_data['firstname'],
                      'lastname': serializer_order.validated_data['lastname'],
