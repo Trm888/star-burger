@@ -1,9 +1,11 @@
+from django.db.models import F
 from django.http import JsonResponse
 from django.templatetags.static import static
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
 from rest_framework.serializers import ModelSerializer
 
+from django.db import models
 from .models import Product, Order, OrderItem
 
 
@@ -91,6 +93,7 @@ def register_order(request):
         OrderItem.objects.create(
             product=products['product'],
             quantity=products['quantity'],
+            price=products['product'].price * products['quantity'],
             order=order,
         )
     return Response({'id': order.id,

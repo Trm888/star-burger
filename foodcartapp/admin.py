@@ -29,6 +29,12 @@ class OrderAdmin(admin.ModelAdmin):
         'phonenumber',
         'address',
     ]
+    def save_formset(self, request, form, formset, change):
+        instances = formset.save(commit=False)
+        for instance in instances:
+            instance.price = instance.product.price * instance.quantity
+            instance.save()
+        formset.save_m2m()
     inlines = [
         OrderItemInline
     ]
@@ -123,6 +129,14 @@ class ProductAdmin(admin.ModelAdmin):
 
     get_image_list_preview.short_description = 'превью'
 
+
+@admin.register(OrderItem)
+class OrderItemAdmin(admin.ModelAdmin):
+    list_display = [
+        'product',
+        'quantity',
+        'order',
+    ]
 
 @admin.register(ProductCategory)
 class ProductAdmin(admin.ModelAdmin):
