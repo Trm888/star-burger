@@ -29,6 +29,7 @@ class OrderAdmin(admin.ModelAdmin):
         'lastname',
         'phonenumber',
         'address',
+        'status',
     ]
     def save_formset(self, request, form, formset, change):
         instances = formset.save(commit=False)

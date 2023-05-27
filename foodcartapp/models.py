@@ -148,6 +148,14 @@ class Order(models.Model):
     phonenumber = PhoneNumberField('Телефон', blank=False, null=False)
     address = models.CharField('Адрес', max_length=300, blank=False, null=False)
 
+    ORDER_STATUS_CHOICES = [
+        ('Новый', 'Новый'),
+        ('Готовится', 'Готовится'),
+        ('В пути', 'В пути'),
+        ('Доставлен', 'Доставлен'),
+    ]
+    status = models.CharField('Статус заказа', max_length=50, choices=ORDER_STATUS_CHOICES, default='new', blank=False,)
+
     objects = OrderQuerySet.as_manager()
 
     class Meta:
