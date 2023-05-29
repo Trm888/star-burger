@@ -31,18 +31,12 @@ class OrderAdmin(admin.ModelAdmin):
         'address',
         'status',
     ]
-    def save_formset(self, request, form, formset, change):
-        instances = formset.save(commit=False)
-        for instance in instances:
-            instance.price = instance.product.price * instance.quantity
-            instance.save()
-        formset.save_m2m()
+    ordering = ['status']
     inlines = [
         OrderItemInline
     ]
 
     def response_post_save_change(self, request, obj):
-        print(request.GET)
         if "next" in request.GET:
             return redirect(reverse('restaurateur:view_orders'))
         return redirect(reverse('admin:foodcartapp_order_changelist'))

@@ -20,6 +20,7 @@
       <th>Клиент</th>
       <th>Телефон</th>
       <th>Адрес доставки</th>
+      <th>Список ресторанов</th>
       <th>Комметарий</th>
       <th>Ссылка на админку</th>
     </tr>
@@ -33,6 +34,24 @@
       <td> {{ item.firstname }} {{ item.lastname }}</td>
       <td> {{ item.phonenumber }}</td>
       <td> {{ item.address }}</td>
+      <td>
+      <details>
+        <summary>Открыть</summary>
+        <br>
+        {% if item.restaurateur %}
+          <li>Готовится в {{ item.restaurateur }}</li>
+        {% else %}
+        {% for restaurants in available_restaurants %}
+          {% if item == restaurants.0 %}
+            {% for restaurant in restaurants.1 %}
+              Может быть приготовлен в:
+              <li>{{ restaurant.name }}</li>
+            {% endfor %}
+          {% endif %}
+        {% endfor %}
+       {% endif %}
+      </details>
+      </td>
       <td> {{ item.comment }}</td>
       <td><a href={% url "admin:foodcartapp_order_change" object_id=item.id %}?next={{ currentUrl }}>Перейти</a> </td>
     </tr>

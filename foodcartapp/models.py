@@ -1,6 +1,6 @@
 from django.core.validators import MinValueValidator
 from django.db import models
-from django.db.models import F, Sum
+from django.db.models import F, Sum, Subquery
 from django.utils import timezone
 from phonenumber_field.modelfields import PhoneNumberField
 
@@ -44,7 +44,6 @@ class OrderQuerySet(models.QuerySet):
         return self.annotate(
             total_price=models.Sum(models.F('products__quantity') * models.F('products__product__price'))
         )
-
 
 class ProductCategory(models.Model):
     name = models.CharField(
@@ -162,6 +161,15 @@ class Order(models.Model):
     called_at = models.DateTimeField('Дата звонка', blank=True, null=True)
     delivered_at = models.DateTimeField('Дата доставки', blank=True, null=True)
     way_of_payment = models.CharField('Способ оплаты', max_length=50, choices=[('Наличные', 'Наличные'), ('Картой', 'Картой')], default='Картой', blank=False, null=False)
+    restaurateur = models.ForeignKey('Restaurant', on_delete=models.CASCADE, related_name='orders', blank=True, null=True)
+
+    def save(self, *args, **kwargs):
+        if self.pk:
+            current_order = Order.objects.get(pk=self.pk)
+            if current_order.restaurateur != self.restaurateur and self.status == 'Новый':
+                self.status = 'Готовится'
+
+        super().save(*args, **kwargs)
 
     class Meta:
         verbose_name = 'Заказ'
