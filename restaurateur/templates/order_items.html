@@ -25,7 +25,7 @@
       <th>Ссылка на админку</th>
     </tr>
 
-    {% for item in order_items %}
+    {% for item, restaurant, distance in available_restaurants %}
     <tr>
       <td> {{ item.id }}</td>
       <td> {{ item.status }}</td>
@@ -41,14 +41,11 @@
         {% if item.restaurateur %}
           <li>Готовится в {{ item.restaurateur }}</li>
         {% else %}
-        {% for restaurants in available_restaurants %}
-          {% if item == restaurants.0 %}
-            {% for restaurant in restaurants.1 %}
-              Может быть приготовлен в:
-              <li>{{ restaurant.name }}</li>
-            {% endfor %}
-          {% endif %}
-        {% endfor %}
+        {% if restaurant %}
+          <li>{{ restaurant.name }}, расстояние {{ distance }} км.</li>
+        {% else %}
+          Нет доступных ресторанов
+        {% endif %}
        {% endif %}
       </details>
       </td>

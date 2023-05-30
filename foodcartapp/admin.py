@@ -36,6 +36,7 @@ class OrderAdmin(admin.ModelAdmin):
         OrderItemInline
     ]
 
+
     def response_post_save_change(self, request, obj):
         if "next" in request.GET:
             return redirect(reverse('restaurateur:view_orders'))
@@ -138,6 +139,8 @@ class OrderItemAdmin(admin.ModelAdmin):
         'quantity',
         'order',
     ]
+
+
 
 @admin.register(ProductCategory)
 class ProductAdmin(admin.ModelAdmin):

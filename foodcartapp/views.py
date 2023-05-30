@@ -6,6 +6,8 @@ from rest_framework.response import Response
 from rest_framework.serializers import ModelSerializer
 
 from django.db import models, transaction
+
+from .fetch_coordinates import fetch_coordinates
 from .models import Product, Order, OrderItem
 
 
@@ -87,7 +89,9 @@ def register_order(request):
         firstname=serializer_order.validated_data['firstname'],
         lastname=serializer_order.validated_data['lastname'],
         phonenumber=serializer_order.validated_data['phonenumber'],
-        address=serializer_order.validated_data['address']
+        address=serializer_order.validated_data['address'],
+        lat=fetch_coordinates(serializer_order.validated_data['address'])[0],
+        lon=fetch_coordinates(serializer_order.validated_data['address'])[1],
     )
 
     for products in serializer_order.validated_data['products']:
