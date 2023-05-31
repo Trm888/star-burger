@@ -1,12 +1,10 @@
-from django.db.models import F
+from django.db import transaction
 from django.http import JsonResponse
 from django.templatetags.static import static
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
 from rest_framework.serializers import ModelSerializer
-
-from django.db import models, transaction
-
+from django.conf import settings
 from .fetch_coordinates import fetch_coordinates
 from .models import Product, Order, OrderItem
 
@@ -84,14 +82,14 @@ def register_order(request):
 
     serializer_order = OrderSerializer(data=client_order)
     serializer_order.is_valid(raise_exception=True)
-
+    print(serializer_order.validated_data['address'])
     order = Order.objects.create(
         firstname=serializer_order.validated_data['firstname'],
         lastname=serializer_order.validated_data['lastname'],
         phonenumber=serializer_order.validated_data['phonenumber'],
         address=serializer_order.validated_data['address'],
-        lat=fetch_coordinates(serializer_order.validated_data['address'])[1],
-        lon=fetch_coordinates(serializer_order.validated_data['address'])[0],
+        lat=fetch_coordinates(serializer_order.validated_data['address'], '5ebb4ea0-c439-4198-ab78-bebb68c181ee')[1],
+        lon=fetch_coordinates(serializer_order.validated_data['address'], '5ebb4ea0-c439-4198-ab78-bebb68c181ee')[0],
     )
 
     for products in serializer_order.validated_data['products']:

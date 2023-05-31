@@ -1,13 +1,9 @@
+import requests
+
 import time
 
-import requests
-from environs import Env
 
-
-def fetch_coordinates(address):
-    env = Env()
-    env.read_env()
-    apikey = env.str("YANDEX_GEOCODER_API_KEY")
+def fetch_coordinates(address, apikey):
 
     base_url = "https://geocode-maps.yandex.ru/1.x"
     max_retries = 3
@@ -29,7 +25,6 @@ def fetch_coordinates(address):
             lon, lat = most_relevant['GeoObject']['Point']['pos'].split(" ")
             return lon, lat
         except requests.exceptions.HTTPError:
-
+            time.sleep(1)
             retries += 1
     return None, None
-

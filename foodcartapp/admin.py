@@ -1,5 +1,4 @@
 from django.contrib import admin
-from django.http import HttpResponseRedirect
 from django.shortcuts import reverse, redirect
 from django.templatetags.static import static
 from django.utils.html import format_html
@@ -36,11 +35,11 @@ class OrderAdmin(admin.ModelAdmin):
         OrderItemInline
     ]
 
-
     def response_post_save_change(self, request, obj):
         if "next" in request.GET:
             return redirect(reverse('restaurateur:view_orders'))
         return redirect(reverse('admin:foodcartapp_order_changelist'))
+
 
 @admin.register(Restaurant)
 class RestaurantAdmin(admin.ModelAdmin):
@@ -139,7 +138,6 @@ class OrderItemAdmin(admin.ModelAdmin):
         'quantity',
         'order',
     ]
-
 
 
 @admin.register(ProductCategory)

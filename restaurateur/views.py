@@ -6,6 +6,7 @@ from django.shortcuts import redirect, render
 from django.urls import reverse_lazy
 from django.views import View
 from geopy import distance
+
 from foodcartapp.models import Product, Restaurant, Order
 
 
@@ -111,9 +112,7 @@ def view_orders(request):
             restaurants_with_distance.append((restaurant, rounded_distance))
 
         closest_restaurant, min_distances = min(restaurants_with_distance, key=lambda x: x[1])
-        print(type(closest_restaurant), type(min_distances))
         available_restaurants.append((order, closest_restaurant, min_distances))
-    # print(available_restaurants)
     return render(request, template_name='order_items.html', context={
         'available_restaurants': available_restaurants,
 
