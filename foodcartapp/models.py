@@ -164,8 +164,8 @@ class Order(models.Model):
     delivered_at = models.DateTimeField('Дата доставки', blank=True, null=True)
     way_of_payment = models.CharField('Способ оплаты', max_length=50, choices=[('Наличные', 'Наличные'), ('Картой', 'Картой')], default='Картой', blank=False, null=False)
     restaurateur = models.ForeignKey('Restaurant', on_delete=models.CASCADE, related_name='orders', blank=True, null=True)
-    lat = models.FloatField('Широта', null=True, blank=True)
-    lon = models.FloatField('Долгота', null=True, blank=True)
+    lat = models.FloatField('Широта', null=True, blank=True, default=None)
+    lon = models.FloatField('Долгота', null=True, blank=True, default=None)
 
     def save(self, *args, **kwargs):
         if self.pk:

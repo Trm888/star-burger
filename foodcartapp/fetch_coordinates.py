@@ -10,7 +10,9 @@ def fetch_coordinates(address):
     apikey = env.str("YANDEX_GEOCODER_API_KEY")
 
     base_url = "https://geocode-maps.yandex.ru/1.x"
-    while True:
+    max_retries = 3
+    retries = 0
+    while retries < max_retries:
         try:
             response = requests.get(base_url, params={
                 "geocode": address,
@@ -27,7 +29,7 @@ def fetch_coordinates(address):
             lon, lat = most_relevant['GeoObject']['Point']['pos'].split(" ")
             return lon, lat
         except requests.exceptions.HTTPError:
-            time.sleep(2)
 
-
+            retries += 1
+    return None, None
 

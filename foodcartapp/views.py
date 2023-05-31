@@ -90,8 +90,8 @@ def register_order(request):
         lastname=serializer_order.validated_data['lastname'],
         phonenumber=serializer_order.validated_data['phonenumber'],
         address=serializer_order.validated_data['address'],
-        lat=fetch_coordinates(serializer_order.validated_data['address'])[0],
-        lon=fetch_coordinates(serializer_order.validated_data['address'])[1],
+        lat=fetch_coordinates(serializer_order.validated_data['address'])[1],
+        lon=fetch_coordinates(serializer_order.validated_data['address'])[0],
     )
 
     for products in serializer_order.validated_data['products']:
