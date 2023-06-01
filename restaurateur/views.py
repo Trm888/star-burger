@@ -103,10 +103,9 @@ def view_orders(request):
         if order_address not in locations:
             order_geolocation = create_location(order_address, settings.YANDEX_GEOCODER_API_KEY)
         else:
-            order_geolocation = Location.objects.get(address=order_address).lat,\
+            order_geolocation = Location.objects.get(address=order_address).lat, \
                 Location.objects.get(address=order_address).lon
             Order.objects.filter(id=order.id).update(lat=order_geolocation[0], lon=order_geolocation[1])
-
 
         restaurants_per_product = []
         for product in order.products.all():

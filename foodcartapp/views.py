@@ -5,9 +5,11 @@ from django.templatetags.static import static
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
 from rest_framework.serializers import ModelSerializer
+
 from locations.fetch_coordinates import create_location
 from locations.models import Location
 from .models import Product, Order, OrderItem
+
 
 def banners_list_api(request):
     return JsonResponse([

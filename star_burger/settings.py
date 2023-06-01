@@ -1,9 +1,7 @@
 import os
 
 import dj_database_url
-
 from environs import Env
-
 
 env = Env()
 env.read_env()
@@ -13,9 +11,9 @@ STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
 
 YANDEX_GEOCODER_API_KEY = env.str("YANDEX_GEOCODER_API_KEY")
 SECRET_KEY = env('SECRET_KEY')
-DEBUG = env.bool('DEBUG', True)
+DEBUG = env.bool('DEBUG')
 
-ALLOWED_HOSTS = env.list('ALLOWED_HOSTS', ['127.0.0.1', 'localhost'])
+ALLOWED_HOSTS = env.list("ALLOWED_HOSTS", [])
 
 INSTALLED_APPS = [
     'foodcartapp.apps.FoodcartappConfig',
@@ -120,7 +118,6 @@ STATIC_URL = '/static/'
 INTERNAL_IPS = [
     '127.0.0.1'
 ]
-
 
 STATICFILES_DIRS = [
     os.path.join(BASE_DIR, "assets"),

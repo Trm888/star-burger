@@ -1,12 +1,11 @@
-import requests
-
 import time
+
+import requests
 
 from locations.models import Location
 
 
 def fetch_coordinates(address, apikey):
-
     base_url = "https://geocode-maps.yandex.ru/1.x"
     max_retries = 3
     retries = 0
@@ -30,6 +29,8 @@ def fetch_coordinates(address, apikey):
             time.sleep(1)
             retries += 1
     return None
+
+
 def create_location(address, apikey):
     try:
         lon, lat = fetch_coordinates(address, apikey)

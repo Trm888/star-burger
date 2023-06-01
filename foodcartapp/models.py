@@ -1,6 +1,5 @@
 from django.core.validators import MinValueValidator
 from django.db import models
-from django.db.models import F, Sum, Subquery
 from django.utils import timezone
 from phonenumber_field.modelfields import PhoneNumberField
 
@@ -46,6 +45,7 @@ class OrderQuerySet(models.QuerySet):
         return self.annotate(
             total_price=models.Sum(models.F('products__quantity') * models.F('products__product__price'))
         )
+
 
 class ProductCategory(models.Model):
     name = models.CharField(
@@ -139,7 +139,8 @@ class OrderItem(models.Model):
     product = models.ForeignKey('Product', on_delete=models.CASCADE, blank=False, null=False)
     quantity = models.PositiveIntegerField('Количество', validators=[MinValueValidator(1)], default=1, blank=False,
                                            null=False)
-    price = models.DecimalField('Цена', max_digits=8, decimal_places=2, validators=[MinValueValidator(0)], blank=False, null=False)
+    price = models.DecimalField('Цена', max_digits=8, decimal_places=2, validators=[MinValueValidator(0)], blank=False,
+                                null=False)
 
     objects = OrderQuerySet.as_manager()
 
@@ -156,14 +157,18 @@ class Order(models.Model):
         ('В пути', 'В пути'),
         ('Доставлен', 'Доставлен'),
     ]
-    status = models.CharField('Статус заказа', max_length=50, choices=ORDER_STATUS_CHOICES, default='new', blank=False,)
+    status = models.CharField('Статус заказа', max_length=50, choices=ORDER_STATUS_CHOICES, default='new',
+                              blank=False, )
     comment = models.TextField('Комментарий', max_length=300, blank=True, null=True)
     objects = OrderQuerySet.as_manager()
     registered_at = models.DateTimeField('Дата регистрации заказа', default=timezone.now, blank=False, null=False)
     called_at = models.DateTimeField('Дата звонка', blank=True, null=True)
     delivered_at = models.DateTimeField('Дата доставки', blank=True, null=True)
-    way_of_payment = models.CharField('Способ оплаты', max_length=50, choices=[('Наличные', 'Наличные'), ('Картой', 'Картой')], default='Картой', blank=False, null=False)
-    restaurateur = models.ForeignKey('Restaurant', on_delete=models.CASCADE, related_name='orders', blank=True, null=True)
+    way_of_payment = models.CharField('Способ оплаты', max_length=50,
+                                      choices=[('Наличные', 'Наличные'), ('Картой', 'Картой')], default='Картой',
+                                      blank=False, null=False)
+    restaurateur = models.ForeignKey('Restaurant', on_delete=models.CASCADE, related_name='orders', blank=True,
+                                     null=True)
     lat = models.FloatField('Широта', null=True, blank=True, default=None)
     lon = models.FloatField('Долгота', null=True, blank=True, default=None)
 
