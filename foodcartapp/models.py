@@ -157,7 +157,7 @@ class Order(models.Model):
         ('В пути', 'В пути'),
         ('Доставлен', 'Доставлен'),
     ]
-    status = models.CharField('Статус заказа', max_length=50, choices=ORDER_STATUS_CHOICES, default='new',
+    status = models.CharField('Статус заказа', max_length=50, choices=ORDER_STATUS_CHOICES, default='Новый',
                               blank=False, )
     comment = models.TextField('Комментарий', max_length=300, blank=True, null=True)
     objects = OrderQuerySet.as_manager()

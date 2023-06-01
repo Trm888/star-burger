@@ -99,7 +99,6 @@ def view_orders(request):
     available_restaurants = []
     for order in orders:
         order_address = order.address
-        print(order_address)
         if order_address not in locations:
             order_geolocation = create_location(order_address, settings.YANDEX_GEOCODER_API_KEY)
         else:
