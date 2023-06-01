@@ -8,6 +8,9 @@ from django.views import View
 from geopy import distance
 
 from foodcartapp.models import Product, Restaurant, Order
+from locations.fetch_coordinates import create_location
+from locations.models import Location
+from star_burger import settings
 
 
 class Login(forms.Form):
@@ -92,10 +95,18 @@ def view_restaurants(request):
 @user_passes_test(is_manager, login_url='restaurateur:login')
 def view_orders(request):
     orders = Order.objects.prefetch_related('products').exclude(status='Доставлен').get_total_price().order_by('status')
-
+    locations = Location.objects.values_list('address', flat=True)
     available_restaurants = []
     for order in orders:
-        order_address = order.lat, order.lon
+        order_address = order.address
+        print(order_address)
+        if order_address not in locations:
+            order_geolocation = create_location(order_address, settings.YANDEX_GEOCODER_API_KEY)
+        else:
+            order_geolocation = Location.objects.get(address=order_address).lat,\
+                Location.objects.get(address=order_address).lon
+            Order.objects.filter(id=order.id).update(lat=order_geolocation[0], lon=order_geolocation[1])
+
 
         restaurants_per_product = []
         for product in order.products.all():
@@ -108,7 +119,7 @@ def view_orders(request):
         restaurants_with_distance = []
         for restaurant in common_restaurants:
             restaurant_address = restaurant.lat, restaurant.lon
-            rounded_distance = round(distance.distance(order_address, restaurant_address).kilometers, 2)
+            rounded_distance = round(distance.distance(order_geolocation, restaurant_address).kilometers, 2)
             restaurants_with_distance.append((restaurant, rounded_distance))
 
         closest_restaurant, min_distances = min(restaurants_with_distance, key=lambda x: x[1])

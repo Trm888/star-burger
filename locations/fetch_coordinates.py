@@ -29,13 +29,16 @@ def fetch_coordinates(address, apikey):
         except requests.exceptions.HTTPError:
             time.sleep(1)
             retries += 1
-    return None, None
-
+    return None
 def create_location(address, apikey):
-    lon, lat = fetch_coordinates(address, apikey)
-    Location.objects.get_or_create(
-        address=address,
-        lat=lat,
-        lon=lon,
-    )
-    return lon, lat
+    try:
+        lon, lat = fetch_coordinates(address, apikey)
+        Location.objects.get_or_create(
+            address=address,
+            lat=lat,
+            lon=lon,
+        )
+        return lat, lon
+    except TypeError as e:
+        print(e)
+        return None, None

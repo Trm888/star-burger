@@ -78,12 +78,12 @@ class OrderSerializer(ModelSerializer):
 @transaction.atomic
 def register_order(request):
     client_order = request.data
-    locations = Location.objects.all()
+    locations = Location.objects.values_list('address', flat=True)
     serializer_order = OrderSerializer(data=client_order)
     serializer_order.is_valid(raise_exception=True)
     client_address = serializer_order.validated_data['address']
-    if client_address not in locations.values_list('address', flat=True):
-        lon, lat = create_location(serializer_order.validated_data['address'], settings.YANDEX_GEOCODER_API_KEY)
+    if client_address not in locations:
+        lat, lon = create_location(serializer_order.validated_data['address'], settings.YANDEX_GEOCODER_API_KEY)
     else:
         lon = Location.objects.get(address=client_address).lon
         lat = Location.objects.get(address=client_address).lat
