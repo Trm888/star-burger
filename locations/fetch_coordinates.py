@@ -2,6 +2,8 @@ import requests
 
 import time
 
+from locations.models import Location
+
 
 def fetch_coordinates(address, apikey):
 
@@ -28,3 +30,12 @@ def fetch_coordinates(address, apikey):
             time.sleep(1)
             retries += 1
     return None, None
+
+def create_location(address, apikey):
+    lon, lat = fetch_coordinates(address, apikey)
+    Location.objects.get_or_create(
+        address=address,
+        lat=lat,
+        lon=lon,
+    )
+    return lon, lat
