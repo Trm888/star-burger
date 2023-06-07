@@ -146,10 +146,10 @@ class OrderItem(models.Model):
 
 
 class Order(models.Model):
-    firstname = models.CharField('Имя', max_length=50, blank=False, null=False)
-    lastname = models.CharField('Фамилия', max_length=50, blank=False, null=False)
+    firstname = models.CharField('Имя', max_length=50, blank=False)
+    lastname = models.CharField('Фамилия', max_length=50, blank=False)
     phonenumber = PhoneNumberField('Телефон', blank=False, null=False)
-    address = models.CharField('Адрес', max_length=300, blank=False, null=False)
+    address = models.CharField('Адрес', max_length=300, blank=False)
 
     ORDER_STATUS_CHOICES = [
         ('Новый', 'Новый'),
@@ -159,14 +159,14 @@ class Order(models.Model):
     ]
     status = models.CharField('Статус заказа', max_length=50, choices=ORDER_STATUS_CHOICES, default='Новый',
                               blank=False, )
-    comment = models.TextField('Комментарий', max_length=300, blank=True, null=True)
+    comment = models.TextField('Комментарий', max_length=300, blank=True)
     objects = OrderQuerySet.as_manager()
     registered_at = models.DateTimeField('Дата регистрации заказа', default=timezone.now, blank=False, null=False)
     called_at = models.DateTimeField('Дата звонка', blank=True, null=True)
     delivered_at = models.DateTimeField('Дата доставки', blank=True, null=True)
     way_of_payment = models.CharField('Способ оплаты', max_length=50,
                                       choices=[('Наличные', 'Наличные'), ('Картой', 'Картой')], default='Картой',
-                                      blank=False, null=False)
+                                      blank=False)
     restaurateur = models.ForeignKey('Restaurant', on_delete=models.CASCADE, related_name='orders', blank=True,
                                      null=True)
     lat = models.FloatField('Широта', null=True, blank=True, default=None)
