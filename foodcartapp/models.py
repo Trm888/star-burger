@@ -139,7 +139,7 @@ class OrderItem(models.Model):
     product = models.ForeignKey('Product', on_delete=models.CASCADE, blank=False, null=False)
     quantity = models.PositiveIntegerField('Количество', validators=[MinValueValidator(1)], default=1, blank=False,
                                            null=False)
-    price = models.DecimalField('Цена', max_digits=8, decimal_places=2, validators=[MinValueValidator(0)], blank=False,
+    price = models.DecimalField('Цена', max_digits=8, decimal_places=2, validators=[MinValueValidator(0)],
                                 null=False)
 
     objects = OrderQuerySet.as_manager()
