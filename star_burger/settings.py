@@ -7,11 +7,13 @@ env = Env()
 env.read_env()
 
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
+STATIC_ROOT = os.path.join(BASE_DIR, 'static')
 
 YANDEX_GEOCODER_API_KEY = env.str("YANDEX_GEOCODER_API_KEY")
 SECRET_KEY = env('SECRET_KEY')
-DEBUG = env.bool('DEBUG')
+DEBUG = env('DEBUG')
+ROLLBAR_ENVIRONMENT = env.str('ROLLBAR_ENVIRONMENT')
+ROLLBAR_ACCESS_TOKEN = env.str('ROLLBAR_ACCESS_TOKEN')
 
 ALLOWED_HOSTS = env.list("ALLOWED_HOSTS", [])
 
@@ -40,6 +42,7 @@ MIDDLEWARE = [
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
     'debug_toolbar.middleware.DebugToolbarMiddleware',
+    'rollbar.contrib.django.middleware.RollbarNotifierMiddlewareExcluding404',
 ]
 
 ROOT_URLCONF = 'star_burger.urls'
@@ -123,3 +126,14 @@ STATICFILES_DIRS = [
     os.path.join(BASE_DIR, "assets"),
     os.path.join(BASE_DIR, "bundles"),
 ]
+
+
+
+ROLLBAR = {
+    'access_token': ROLLBAR_ACCESS_TOKEN,
+    'environment': ROLLBAR_ENVIRONMENT,
+    'code_version': '1.0',
+    'root': BASE_DIR,
+}
+import rollbar
+rollbar.init(**ROLLBAR)

@@ -7,3 +7,4 @@ requests==2.31.0
 geopy==2.3.0
 django-phonenumber-field[phonenumberslite]==7.1.0
 phonenumberslite==8.13.11
+rollbar==0.16.3
