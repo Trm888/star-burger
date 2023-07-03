@@ -14,7 +14,7 @@ SECRET_KEY = env('SECRET_KEY')
 DEBUG = env('DEBUG')
 ROLLBAR_ENVIRONMENT = env.str('ROLLBAR_ENVIRONMENT')
 ROLLBAR_ACCESS_TOKEN = env.str('ROLLBAR_ACCESS_TOKEN')
-
+DATABASE_URL = env.str('DATABASE_URL')
 ALLOWED_HOSTS = env.list("ALLOWED_HOSTS", [])
 
 INSTALLED_APPS = [
@@ -85,16 +85,22 @@ WSGI_APPLICATION = 'star_burger.wsgi.application'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 MEDIA_URL = '/media/'
 
+
+
 DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.postgresql_psycopg2',
-        'NAME': 'star_burger_db',
-        'USER': 'bigdig',
-        'PASSWORD': 'lolkekazaza1!',
-        'HOST': 'localhost',
-        'PORT': '5432',
-    }
+    'default': dj_database_url.config(default=DATABASE_URL)
 }
+
+# DATABASES = {
+#     'default': {
+#         'ENGINE': 'django.db.backends.postgresql_psycopg2',
+#         'NAME': 'star_burger_db',
+#         'USER': 'bigdig',
+#         'PASSWORD': 'lolkekazaza1!',
+#         'HOST': 'localhost',
+#         'PORT': '5432',
+#     }
+# }
 
 # DATABASES = {
 #     'default': dj_database_url.config(
