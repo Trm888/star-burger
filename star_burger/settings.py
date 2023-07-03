@@ -91,22 +91,6 @@ DATABASES = {
     'default': dj_database_url.config(default=DATABASE_URL)
 }
 
-# DATABASES = {
-#     'default': {
-#         'ENGINE': 'django.db.backends.postgresql_psycopg2',
-#         'NAME': 'star_burger_db',
-#         'USER': 'bigdig',
-#         'PASSWORD': 'lolkekazaza1!',
-#         'HOST': 'localhost',
-#         'PORT': '5432',
-#     }
-# }
-
-# DATABASES = {
-#     'default': dj_database_url.config(
-#         default='sqlite:////{0}'.format(os.path.join(BASE_DIR, 'db.sqlite3'))
-#     )
-# }
 
 AUTH_PASSWORD_VALIDATORS = [
     {
