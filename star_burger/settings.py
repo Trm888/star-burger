@@ -12,8 +12,7 @@ STATIC_ROOT = os.path.join(BASE_DIR, 'static')
 YANDEX_GEOCODER_API_KEY = env.str("YANDEX_GEOCODER_API_KEY")
 SECRET_KEY = env('SECRET_KEY')
 DEBUG = env.bool('DEBUG')
-ROLLBAR_ENVIRONMENT = env.str('ROLLBAR_ENVIRONMENT')
-ROLLBAR_ACCESS_TOKEN = env.str('ROLLBAR_ACCESS_TOKEN')
+
 DATABASE_URL = env.str('DATABASE_URL')
 ALLOWED_HOSTS = env.list("ALLOWED_HOSTS")
 
@@ -129,12 +128,13 @@ STATICFILES_DIRS = [
 ]
 
 
-
-ROLLBAR = {
-    'access_token': ROLLBAR_ACCESS_TOKEN,
-    'environment': ROLLBAR_ENVIRONMENT,
-    'code_version': '1.0',
-    'root': BASE_DIR,
-}
-import rollbar
-rollbar.init(**ROLLBAR)
+if env.str('ROLLBAR_ACCESS_TOKEN', default=''):
+    ROLLBAR_ACCESS_TOKEN = env.str('ROLLBAR_ACCESS_TOKEN')
+    ROLLBAR = {
+        'access_token': ROLLBAR_ACCESS_TOKEN,
+        'environment': 'local_dev',
+        'code_version': '1.0',
+        'root': BASE_DIR,
+    }
+    import rollbar
+    rollbar.init(**ROLLBAR)
