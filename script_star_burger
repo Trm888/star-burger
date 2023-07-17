@@ -1,0 +1,34 @@
+#!/bin/bash
+
+set -eo pipefail
+
+git pull
+echo "Файлы обновлены"
+source env/bin/activate
+
+echo "Установка библиотек для Python"
+pip install -r requirements.txt
+
+echo "Установка пвкетов Node.js"
+npm ci --dev
+npx browserslist@latest --update-db
+echo "Сборка фронтенда"
+./node_modules/.bin/parcel build bundles-src/index.js --dist-dir bundles --public-url="./"
+
+echo "Пересборка статики Django"
+source env/bin/activate
+python3 manage.py collectstatic --noinput
+
+echo "Миграций"
+python3 manage.py migrate
+
+systemctl reload nginx
+
+source .env
+
+COMMIT_HASH=$(git rev-parse HEAD)
+
+curl -H "X-Rollbar-Access-Token: $ROLLBAR_ACCESS_TOKEN" -H "Content-Type: application/json" -X POST 'https://api.rollbar.com/api/1/deploy' -d '{"environment": "production", "revision": "'"$COMMIT_HASH"'"}'
+
+
+echo "Скрипт завершен"
