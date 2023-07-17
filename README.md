@@ -148,7 +148,149 @@ Parcel будет следить за файлами в каталоге `bundle
 - `SECRET_KEY` — секретный ключ проекта. Он отвечает за шифрование на сайте. Например, им зашифрованы все пароли на вашем сайте.
 - `ALLOWED_HOSTS` — [см. документацию Django](https://docs.djangoproject.com/en/3.1/ref/settings/#allowed-hosts)
 - `YANDEX_GEOCODER_API_KEY` — [см. статью](https://dvmn.org/encyclopedia/api-docs/yandex-geocoder-api/)
+- `DATABASE_URL` — настройки доступа к базе данных PostgreSQL с помощью одного URL,
+пример URL для PostgreSQL может выглядеть следующим образом:
+`postgres://имя_пользователя:пароль@localhost:5432/имя_базы_данных`.
+Вы можете указать соответствующие значения для имени пользователя, пароля, хоста и имени базы данных в URL.
+- `ROLLBAR_ACCESS_TOKEN` — необязательный параметр. Токен для [Rollbar](https://rollbar.com/) — сервиса для сбора ошибок. Если вы не хотите использовать Rollbar, то просто удалите эту строку из файла `.env`.
 
+Создать базу данных PostgreSQL и пользователя к ней:
+
+```sh
+sudo -u postgres psql
+```
+
+```sql
+CREATE DATABASE new_db_name WITH ENCODING='UTF8' LC_CTYPE='ru_RU.UTF-8' LC_COLLATE='ru_RU.UTF-8' OWNER=postgres TEMPLATE=template0;
+GRANT ALL PRIVILEGES ON DATABASE star_burger_db TO postgres;
+ALTER USER username WITH PASSWORD 'new_password';
+```
+
+Создайте файл star_burger.service в каталоге /etc/systemd/system со следующим содержимым:
+
+```sh
+[Unit]
+Requires=postgresql.service
+After=postgresql.service
+[Service]
+WorkingDirectory=/opt/star-burger
+ExecStart=/opt/star-burger/env/bin/gunicorn -w 3 --bind 127.0.0.1:8000 star_burger.wsgi:application
+Restart=always
+[Install]
+WantedBy=multi-user.target
+```
+Также необходимо настроить файлы обновления сертификатов SSL. Для этого создайте файл certbot-renewal.service и certbot-renewal.timer в каталоге /etc/systemd/system со следующим содержимым:
+
+certbot-renewal
+```sh
+[Unit]
+Description=Certbot Renewal
+
+[Service]
+ExecStart=/usr/bin/certbot renew --force-renewal --post-hook "systemctl reload nginx.service"
+```
+
+certbot-renewal.timer
+```sh
+[Unit]
+Description=Timer for Certbot Renewal
+
+[Timer]
+OnBootSec=300
+OnUnitActiveSec=1w
+
+[Install]
+WantedBy=multi-user.target
+```
+Настройка для очистки сессий. Создайте файл starburger-clearsessions.service и starburger-clearsessions.timer в каталоге /etc/systemd/system со следующим содержимым:
+
+```sh
+[Unit]
+Description=Clear Django Sessions
+Requires=star_burger.service
+[Service]
+WorkingDirectory=/opt/star-burger
+ExecStart=/opt/star-burger/env/bin/python3 manage.py clearsessions
+Restart=on-abort
+[Install]
+WantedBy=multi-user.target
+```
+
+```sh
+[Unit]
+Description=Timer for Clearsessions
+
+[Timer]
+OnBootSec=300
+OnUnitActiveSec=1w
+
+[Install]
+WantedBy=multi-user.target
+```
+Далее следует добавить сервисы в автозагрузку:
+
+```sh
+sudo systemctl daemon-reload
+sudo systemctl enable star_burger
+sudo systemctl enable certbot-renewal.timer
+sudo systemctl enable starburger-clearsessions.timer
+```
+
+Настроить nginx: создать файл `/etc/nginx/sites-enabled/starbrger` со следующим содержимым:
+
+```sh
+server {
+    server_name kek.lolkekazaza.ru, www.kek.lolkekazaza.ru; # managed by Certbot
+
+    location / {
+        include proxy_params;
+        proxy_pass http://127.0.0.1:8000;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+    }
+    location /static/ {
+        alias /opt/star-burger/static/;
+    }
+    location /media/ {
+        alias /opt/star-burger/media/;
+    }
+
+
+
+    listen 443 ssl; # managed by Certbot
+    ssl_certificate /etc/letsencrypt/live/www.kek.lolkekazaza.ru/fullchain.pem; # managed by Certbot
+    ssl_certificate_key /etc/letsencrypt/live/www.kek.lolkekazaza.ru/privkey.pem; # managed by Certbot
+    include /etc/letsencrypt/options-ssl-nginx.conf; # managed by Certbot
+    ssl_dhparam /etc/letsencrypt/ssl-dhparams.pem; # managed by Certbot
+
+}
+server {
+    if ($host = kek.lolkekazaza.ru) {
+        return 301 https://$host$request_uri;
+    } # managed by Certbot
+    if ($host = www.kek.lolkekazaza.ru) {
+        return 301 https://$host$request_uri;
+    }
+    listen 80;
+    server_name kek.lolkekazaza.ru www.kek.lolkekazaza.ru;
+    return 404;
+}
+```
+
+Перезапустите nginx:
+
+```sh
+sudo systemctl restart nginx
+```
+
+При необходимости внесения изменений в репозиторий, можно обновить проект с помощью скрипта `script_star_burger`, который находится в корне проекта:
+
+
+```sh
+./script_star_burger
+```
+Ссылка на демонстрационную версию проекта: [kek.lolkekazaza.ru](https://kek.lolkekazaza.ru/)
 ## Цели проекта
 
 Код написан в учебных целях — это урок в курсе по Python и веб-разработке на сайте [Devman](https://dvmn.org). За основу был взят код проекта [FoodCart](https://github.com/Saibharath79/FoodCart).
