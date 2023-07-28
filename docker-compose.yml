@@ -1,0 +1,52 @@
+
+version: '3.9'
+
+
+services:
+  front:
+    build:
+      dockerfile: Dockerfile-front
+      context: .
+  postgres_db:
+    image: postgres:14.8
+    volumes:
+      - data:/var/lib/postgresql/data
+    env_file:
+      - .env
+
+  web:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: star_burger:latest
+    container_name: star_burger
+    depends_on:
+      - postgres_db
+    volumes:
+      - static_volume:/star-burger/static
+      - media_volume:/star-burger/media
+    env_file:
+      - .env
+    command: sh -c "python manage.py collectstatic --noinput && python manage.py migrate && gunicorn star_burger.wsgi:application --bind 0.0.0.0:8000"
+    ports:
+      - "8000:8000"
+
+  nginx:
+    build:
+      dockerfile: ./Dockerfile
+      context: ./docker/nginx/
+    container_name: star_burger_nginx
+    image: star_burger_nginx
+    volumes:
+      - static_volume:/star-burger/static
+      - media_volume:/star-burger/media
+    depends_on:
+      - web
+    ports:
+      - "80:80"
+
+volumes:
+  data:
+  static_volume:
+  media_volume:
+
