@@ -6,10 +6,7 @@ WORKDIR /opt/star-burger
 COPY package*.json ./
 COPY bundles-src ./bundles-src/
 
-RUN npm install
-RUN npm ci --dev
-RUN npx browserslist@latest --update-db
-
+RUN npm install && npm ci --dev && npx browserslist@latest --update-db && apt-get clean && rm -rf /var/lib/apt/lists/*
 
 RUN ./node_modules/.bin/parcel build bundles-src/index.js --dist-dir bundles --public-url="./"
 
