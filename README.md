@@ -291,6 +291,28 @@ sudo systemctl restart nginx
 ./script_star_burger
 ```
 Ссылка на демонстрационную версию проекта: [kek.lolkekazaza.ru](https://kek.lolkekazaza.ru/)
+
+
+## Как запустить dev-версию сайта через Docker
+
+Установите [Docker](https://docs.docker.com/engine/install/) и [Docker Compose](https://docs.docker.com/compose/install/).
+
+У вас также должны быть получены сертификаты SSL для домена на котором будет запущен сайт и создана база данных Postgres. Смотри раздел [Как запустить prod-версию сайта](#как-запустить-prod-версию-сайта).
+
+Склонируйте репозиторий:
+
+```sh
+git clone https://github.com/devmanorg/star-burger.git
+```
+
+Настойте переменные окружения в файле `.env` в корне проекта, смотри раздел [Как запустить prod-версию сайта](#как-запустить-prod-версию-сайта).
+
+Запустите скрипт `script_star_burger_with_docker_compose.sh` в корне проекта:
+
+```sh
+./script_star_burger_with_docker_compose.sh
+```
+
 ## Цели проекта
 
 Код написан в учебных целях — это урок в курсе по Python и веб-разработке на сайте [Devman](https://dvmn.org). За основу был взят код проекта [FoodCart](https://github.com/Saibharath79/FoodCart).
